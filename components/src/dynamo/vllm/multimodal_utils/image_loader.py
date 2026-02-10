@@ -97,6 +97,11 @@ class ImageLoader:
         self._image_cache: dict[str, Image.Image] = {}
         self._cache_queue: asyncio.Queue[str] = asyncio.Queue(maxsize=cache_size)
 
+        # DYN_USE_NVIMGCODEC=0 to force PIL path
+        env_override = os.environ.get("DYN_USE_NVIMGCODEC")
+        if env_override is not None:
+            use_nvimgcodec = env_override.lower() not in ("0", "false", "no")
+
         # Fall back to PIL if nvimgcodec was requested but is not installed
         if use_nvimgcodec and not _is_nvimgcodec_available():
             logger.warning(
